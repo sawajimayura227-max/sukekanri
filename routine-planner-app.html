@@ -1,0 +1,1265 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17231f">
+  <link rel="manifest" href="manifest.webmanifest">
+  <title>まよわない一日</title>
+  <style>
+    :root {
+      --bg: #f6f4ee;
+      --panel: #ffffff;
+      --panel-2: #f0f5f2;
+      --ink: #1e2622;
+      --muted: #66716b;
+      --line: #d9ded8;
+      --green: #2f7d5c;
+      --blue: #376f9f;
+      --red: #a95046;
+      --yellow: #c58b2b;
+      --shadow: 0 14px 36px rgba(30, 38, 34, .10);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--bg);
+      font-family: "Yu Gothic", "Meiryo", system-ui, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select {
+      font: inherit;
+      touch-action: manipulation;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+    }
+
+    aside {
+      background: #17231f;
+      color: #f7f6f0;
+      padding: 28px 24px;
+    }
+
+    main {
+      padding: 28px;
+    }
+
+    .quick-nav {
+      display: none;
+      gap: 8px;
+      margin-top: 18px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .quick-nav::-webkit-scrollbar {
+      display: none;
+    }
+
+    .quick-nav a {
+      flex: 0 0 auto;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,.20);
+      border-radius: 999px;
+      color: #f7f6f0;
+      text-decoration: none;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(255,255,255,.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 16px;
+      font-size: 20px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .lead {
+      color: #cfd8d2;
+      font-size: 14px;
+      margin-bottom: 24px;
+    }
+
+    .panel, .plan, .next-action, .checklist-panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .sidebar-panel {
+      border-top: 1px solid rgba(255,255,255,.18);
+      padding-top: 18px;
+      margin-top: 18px;
+    }
+
+    .sidebar-panel h2 {
+      font-size: 15px;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+
+    .fixed-list {
+      display: grid;
+      gap: 10px;
+      font-size: 13px;
+      color: #e7ece8;
+    }
+
+    .daily-routine {
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 8px;
+      background: rgba(255,255,255,.07);
+      padding: 10px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      color: #eef4ef;
+    }
+
+    .daily-routine strong {
+      display: block;
+      color: #94d0b3;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+
+    .weekly-fixed {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .weekday-card {
+      min-height: 74px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 8px;
+      background: rgba(255,255,255,.06);
+      padding: 9px;
+    }
+
+    .weekday-card strong {
+      display: block;
+      color: #94d0b3;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .weekday-card span {
+      display: block;
+      color: #e7ece8;
+      font-size: 12px;
+    }
+
+    .fixed-item {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .day {
+      color: #94d0b3;
+      font-weight: 700;
+    }
+
+    .control-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(120px, 1fr));
+      gap: 12px;
+      align-items: end;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    select, input[type="number"] {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 10px;
+      font-size: 16px;
+    }
+
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 7px 10px;
+      color: var(--ink);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .toggle input {
+      accent-color: var(--green);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .primary {
+      border: 0;
+      border-radius: 6px;
+      background: var(--green);
+      color: #fff;
+      min-height: 42px;
+      padding: 9px 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .ghost {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      min-height: 42px;
+      padding: 9px 14px;
+      cursor: pointer;
+    }
+
+    .status {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .next-action {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 18px;
+      margin-bottom: 16px;
+      background: var(--panel-2);
+    }
+
+    .next-action strong {
+      display: block;
+      font-size: 20px;
+      margin-top: 4px;
+    }
+
+    .checklist-panel {
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .checklist-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .checklist-head h2 {
+      margin-bottom: 0;
+    }
+
+    .checklist {
+      display: grid;
+      gap: 8px;
+    }
+
+    .check-item {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 10px;
+      align-items: start;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .check-item input {
+      width: 20px;
+      height: 20px;
+      margin: 2px 0 0;
+      accent-color: var(--green);
+    }
+
+    .check-item strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+
+    .check-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .check-item.done {
+      background: #f0f5f2;
+    }
+
+    .check-item.done strong {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .plans {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .plan {
+      padding: 16px;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      min-height: 420px;
+    }
+
+    .plan-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 25px;
+      border-radius: 999px;
+      padding: 3px 9px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.green { background: #dff0e8; color: var(--green); }
+    .badge.blue { background: #e2edf5; color: var(--blue); }
+    .badge.red { background: #f3e3df; color: var(--red); }
+    .badge.yellow { background: #f5ecd8; color: #7e5716; }
+
+    .timeline {
+      display: grid;
+      gap: 8px;
+    }
+
+    .slot {
+      display: grid;
+      grid-template-columns: 86px 1fr;
+      gap: 10px;
+      padding: 10px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .time {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .task {
+      font-size: 14px;
+    }
+
+    .task span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .lower-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+      gap: 16px;
+    }
+
+    .week-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .week-day {
+      min-height: 118px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .week-day strong {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .week-day p {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .meter {
+      height: 12px;
+      border-radius: 999px;
+      background: #e2e4df;
+      overflow: hidden;
+      margin: 12px 0;
+    }
+
+    .meter-fill {
+      height: 100%;
+      width: 0;
+      background: var(--yellow);
+      transition: width .25s ease;
+    }
+
+    .word-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1100px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        padding: 22px 18px;
+      }
+
+      .control-grid, .plans, .lower-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .plan {
+        min-height: 0;
+      }
+
+      .week-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      body {
+        background: #f8f7f2;
+      }
+
+      .app {
+        min-height: 100svh;
+      }
+
+      aside {
+        padding: 18px 16px 14px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+      h2 {
+        font-size: 18px;
+        margin-bottom: 12px;
+      }
+
+      .lead {
+        margin-bottom: 0;
+      }
+
+      .quick-nav {
+        display: flex;
+      }
+
+      .sidebar-panel {
+        margin-top: 14px;
+        padding-top: 14px;
+      }
+
+      .sidebar-panel + .sidebar-panel {
+        display: none;
+      }
+
+      .fixed-list {
+        gap: 8px;
+      }
+
+      .fixed-item {
+        grid-template-columns: 38px 1fr;
+      }
+
+      .weekly-fixed {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .weekday-card {
+        min-height: 68px;
+        padding: 8px 6px;
+      }
+
+      .weekday-card strong {
+        font-size: 13px;
+      }
+
+      .weekday-card span {
+        font-size: 11px;
+        line-height: 1.35;
+      }
+
+      main {
+        padding: 14px 12px calc(20px + env(safe-area-inset-bottom));
+      }
+
+      .panel {
+        padding: 14px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        box-shadow: none;
+      }
+
+      .checklist-panel {
+        padding: 14px;
+        margin-bottom: 12px;
+        box-shadow: none;
+      }
+
+      .checklist-head {
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      .toolbar {
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .toolbar h2 {
+        margin-bottom: 0;
+      }
+
+      .toolbar .ghost {
+        width: 100%;
+      }
+
+      .control-grid {
+        gap: 10px;
+      }
+
+      .toggle-row {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+
+      .toggle {
+        width: 100%;
+        justify-content: flex-start;
+        font-size: 14px;
+      }
+
+      .primary, .ghost {
+        width: 100%;
+        min-height: 48px;
+      }
+
+      .next-action {
+        grid-template-columns: 1fr;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        padding: 14px;
+        margin: 0 -12px 12px;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+        box-shadow: 0 8px 24px rgba(30, 38, 34, .12);
+      }
+
+      .next-action strong {
+        font-size: 19px;
+      }
+
+      .slot {
+        grid-template-columns: 72px 1fr;
+        gap: 8px;
+        padding: 9px 0;
+      }
+
+      .time {
+        font-size: 12px;
+      }
+
+      .task {
+        font-size: 14px;
+      }
+
+      .week-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .plans {
+        gap: 12px;
+      }
+
+      .plan {
+        padding: 14px;
+        box-shadow: none;
+      }
+
+      .plan-head {
+        align-items: center;
+      }
+
+      .badge {
+        min-height: 28px;
+      }
+
+      .week-day {
+        min-height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside>
+      <h1>まよわない一日</h1>
+      <p class="lead">制作・投稿・占い発信・休息のための週間プラン</p>
+      <nav class="quick-nav" aria-label="スマホ用メニュー">
+        <a href="#conditions">条件</a>
+        <a href="#nextAction">今やること</a>
+        <a href="#dailyCheck">チェック</a>
+        <a href="#plans">プラン</a>
+        <a href="#progress">進捗</a>
+      </nav>
+
+      <div class="sidebar-panel">
+        <h2>固定予定</h2>
+        <div class="daily-routine">
+          <strong>毎日</strong>
+          占いSNS更新を10〜15分
+        </div>
+        <div class="weekly-fixed" aria-label="曜日ごとの固定予定">
+          <div class="weekday-card"><strong>月</strong><span>占い記事更新</span></div>
+          <div class="weekday-card"><strong>火</strong><span>動画更新</span></div>
+          <div class="weekday-card"><strong>水</strong><span>17:00まで占い仕事</span></div>
+          <div class="weekday-card"><strong>木</strong><span>制作日</span></div>
+          <div class="weekday-card"><strong>金</strong><span>動画更新</span></div>
+          <div class="weekday-card"><strong>土</strong><span>深夜に配信</span></div>
+          <div class="weekday-card"><strong>日</strong><span>午後〜18:00 稽古</span></div>
+          <div class="weekday-card"><strong>月2</strong><span>通院日は軽作業</span></div>
+        </div>
+      </div>
+
+      <div class="sidebar-panel">
+        <h2>制作サイクル</h2>
+        <div class="fixed-list">
+          <div class="fixed-item"><span class="day">1週</span><span>7000字前後のシナリオ制作</span></div>
+          <div class="fixed-item"><span class="day">2週</span><span>録音・編集・BOOTH商品化</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <main>
+      <section class="panel" id="conditions">
+        <div class="toolbar">
+          <h2>今日の条件</h2>
+          <button class="ghost" id="todayButton" type="button">今日に合わせる</button>
+        </div>
+
+        <div class="control-grid">
+          <label>曜日
+            <select id="day">
+              <option value="mon">月曜日</option>
+              <option value="tue">火曜日</option>
+              <option value="wed">水曜日</option>
+              <option value="thu">木曜日</option>
+              <option value="fri">金曜日</option>
+              <option value="sat">土曜日</option>
+              <option value="sun">日曜日</option>
+            </select>
+          </label>
+
+          <label>サイクル
+            <select id="cycle">
+              <option value="week1">1週目：7000字制作</option>
+              <option value="week2">2週目：録音・編集・BOOTH</option>
+            </select>
+          </label>
+
+          <label>作業種別
+            <select id="projectType">
+              <option value="booth">販売物</option>
+              <option value="short">通常創作：1500-5000字</option>
+            </select>
+          </label>
+
+          <label>体力
+            <select id="energy">
+              <option value="normal">普通</option>
+              <option value="high">高い</option>
+              <option value="low">低い</option>
+            </select>
+          </label>
+
+          <label>優先
+            <select id="priority">
+              <option value="scenario">小説・シナリオ</option>
+              <option value="recording">録音中心</option>
+              <option value="booth">BOOTH</option>
+              <option value="fortune">占いまとめ</option>
+              <option value="rest">休息</option>
+            </select>
+          </label>
+
+          <label>現在の文字数
+            <input id="words" type="number" min="0" max="12000" step="100" value="0">
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <label class="toggle"><input id="hospital" type="checkbox">通院あり</label>
+          <label class="toggle"><input id="practice" type="checkbox">稽古あり</label>
+          <label class="toggle"><input id="stream" type="checkbox">配信あり</label>
+        </div>
+      </section>
+
+      <section class="next-action" id="nextAction"></section>
+
+      <section class="checklist-panel" id="dailyCheck">
+        <div class="checklist-head">
+          <h2>今日のチェック</h2>
+          <button class="ghost" id="resetChecksButton" type="button">今日のチェックをリセット</button>
+        </div>
+        <div class="checklist" id="checklist"></div>
+      </section>
+
+      <section class="plans" id="plans"></section>
+
+      <section class="lower-grid">
+        <div class="panel">
+          <h2 id="weekTitle">1週目の7000字配分</h2>
+          <div class="week-grid" id="weekGrid"></div>
+        </div>
+
+        <div class="panel" id="progress">
+          <h2 id="progressTitle">進み具合</h2>
+          <div class="word-row">
+            <span id="wordText">0 / 7000字</span>
+            <span id="wordPercent">0%</span>
+          </div>
+          <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+          <p class="note" id="wordNote"></p>
+          <button class="primary" id="refreshButton" type="button">プランを更新</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const dayNames = {
+      mon: "月曜日",
+      tue: "火曜日",
+      wed: "水曜日",
+      thu: "木曜日",
+      fri: "金曜日",
+      sat: "土曜日",
+      sun: "日曜日"
+    };
+
+    const week1Targets = {
+      mon: ["1800字", "構成、場面分け、冒頭を書く。午後遅めは占い記事更新"],
+      tue: ["700字", "制作を軽めに進める。余力で短い場面を追加"],
+      wed: ["0字", "仕事日。次の場面メモだけで合格"],
+      thu: ["2800字", "メイン執筆日。本文を大きく進める"],
+      fri: ["700字", "制作を軽めに進める。不足分かつなぎを書く"],
+      sat: ["1000字", "不足分回収と読み上げ向け調整"],
+      sun: ["確認", "通し読み、修正メモ、翌週準備"]
+    };
+
+    const shortTargets = {
+      mon: ["900字", "短編の芯、冒頭、場面の流れを作る。午後遅めは占い記事更新"],
+      tue: ["300字", "軽めに短い場面か会話を追加"],
+      wed: ["0字", "仕事日。次に書く場面メモだけで合格"],
+      thu: ["1200字", "メイン執筆日。本文をしっかり進める"],
+      fri: ["300字", "軽めにつなぎか結末メモを書く"],
+      sat: ["600字", "不足分の回収、読み返し、整え"],
+      sun: ["確認", "通し読み、修正メモ、次の創作種を決める"]
+    };
+
+    const week2Targets = {
+      mon: ["録音準備", "台本整形、演技メモ、収録範囲を決める"],
+      tue: ["軽作業", "台本確認、販売文、録音素材の整理"],
+      wed: ["軽作業", "占い仕事後に販売文やタグだけ整える"],
+      thu: ["録音・編集", "収録、ノイズ確認、必要なら追録"],
+      fri: ["最終確認", "販売物の確認、説明文、ファイル整理"],
+      sat: ["商品化", "BOOTHページ、画像、価格、説明文を整える"],
+      sun: ["公開確認", "午前に確認。稽古後は休む"]
+    };
+
+    const fields = ["day", "cycle", "projectType", "energy", "priority", "words", "hospital", "practice", "stream"];
+
+    function readState() {
+      return {
+        day: document.getElementById("day").value,
+        cycle: document.getElementById("cycle").value,
+        projectType: document.getElementById("projectType").value,
+        energy: document.getElementById("energy").value,
+        priority: document.getElementById("priority").value,
+        words: Number(document.getElementById("words").value || 0),
+        hospital: document.getElementById("hospital").checked,
+        practice: document.getElementById("practice").checked,
+        stream: document.getElementById("stream").checked
+      };
+    }
+
+    function saveState() {
+      localStorage.setItem("routinePlannerState", JSON.stringify(readState()));
+    }
+
+    function todayKey() {
+      const date = new Date();
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function checklistStorageKey() {
+      return `routinePlannerChecks:${todayKey()}`;
+    }
+
+    function readChecks() {
+      try {
+        return JSON.parse(localStorage.getItem(checklistStorageKey()) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveChecks(checks) {
+      localStorage.setItem(checklistStorageKey(), JSON.stringify(checks));
+    }
+
+    function loadState() {
+      const saved = localStorage.getItem("routinePlannerState");
+      if (!saved) return false;
+      try {
+        const state = JSON.parse(saved);
+        fields.forEach(id => {
+          const el = document.getElementById(id);
+          if (!el || state[id] === undefined) return;
+          if (el.type === "checkbox") el.checked = Boolean(state[id]);
+          else el.value = state[id];
+        });
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    function applyToday() {
+      const map = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+      const day = map[new Date().getDay()];
+      document.getElementById("day").value = day;
+      document.getElementById("practice").checked = day === "sun";
+      document.getElementById("stream").checked = day === "sat";
+      document.getElementById("priority").value = "scenario";
+      saveState();
+      render();
+    }
+
+    function writingTargets(state) {
+      if (state.projectType === "short") return shortTargets;
+      return week1Targets;
+    }
+
+    function writingGoal(state) {
+      return state.projectType === "short" ? 3000 : 7000;
+    }
+
+    function writingLabel(state) {
+      return state.projectType === "short" ? "通常創作" : "シナリオ";
+    }
+
+    function writingGoalText(state) {
+      return state.projectType === "short" ? "1500-5000字" : "7000字";
+    }
+
+    function fixedBlocks(state) {
+      const blocks = [];
+      blocks.push(["毎日", "占いSNS更新 10〜15分"]);
+      if (state.day === "mon") blocks.push(["16:00-18:00", "占い記事更新"]);
+      if (state.day === "tue" || state.day === "fri") blocks.push(["16:00-18:00", "動画更新"]);
+      if (state.day === "wed") blocks.push(["9:00-17:00", "占いの仕事"]);
+      if (state.day === "sun" || state.practice) blocks.push(["13:00-18:00", "朗読劇の稽古"]);
+      if (state.day === "sat" || state.stream) blocks.push(["深夜", "1時間配信"]);
+      if (state.hospital) blocks.push(["通院枠", "移動込みで軽作業日に変更"]);
+      return blocks;
+    }
+
+    function checklistItems(state) {
+      const morning = mainMorningTask(state);
+      const afternoon = afternoonTask(state);
+      const late = lateTask(state);
+      const items = [
+        ["sns", "占いSNS更新", "10〜15分。短文投稿か占いネタを1つ残す"],
+        ["morning", morning[0], morning[1]],
+        ["afternoon", afternoon[0], afternoon[1]],
+        ["late", late[0], late[1]]
+      ];
+
+      if (state.day === "mon") items.push(["fortune-article", "占い記事更新", "本文、見出し、告知文のどれかを進める"]);
+      if (state.day === "tue" || state.day === "fri") items.push(["video-update", "動画更新", "投稿、説明文、告知の確認だけ"]);
+      if (state.priority === "recording") {
+        items.push(["recording-setup", "録音準備", "台本、マイク、収録順、喉の準備"]);
+        items.push(["recording-files", "録音データ整理", "使えるテイク、ファイル名、ノイズ確認"]);
+      }
+      if (state.priority === "fortune") {
+        items.push(["fortune-data", "占いデータ整理", "記事テーマ、SNSネタ、鑑定メニュー用メモ"]);
+        items.push(["fortune-plan", "占い発信のまとめ", "投稿予約、次回テーマ、見出し作成"]);
+      }
+      if (state.day === "wed") items.push(["fortune-work", "占いの仕事", "17:00までの仕事枠"]);
+      if (state.day === "sat" || state.stream) items.push(["stream", "深夜配信", "1時間程度。配信後は休む"]);
+      if (state.day === "sun" || state.practice) items.push(["practice", "朗読劇の稽古", "午後〜18:00の予定"]);
+      if (state.hospital) items.push(["hospital", "通院", "前後は軽作業だけ"]);
+
+      const seen = new Set();
+      return items.filter(item => {
+        if (seen.has(item[0])) return false;
+        seen.add(item[0]);
+        return true;
+      });
+    }
+
+    function focusLabel(state) {
+      if (state.hospital || state.energy === "low") return "軽作業";
+      if (state.priority === "recording") return "録音中心";
+      if (state.priority === "fortune") return "占いまとめ";
+      if (state.priority === "booth" || state.cycle === "week2") return "BOOTH";
+      if (state.priority === "rest") return "休息";
+      if (state.projectType === "short") return "通常創作";
+      return "制作";
+    }
+
+    function mainMorningTask(state) {
+      if (state.hospital) return ["通院前後の余白確保", "連絡、予約確認、メモ整理だけ"];
+      if (state.day === "wed") return ["占いの仕事", "17時までは仕事を優先"];
+      if (state.priority === "recording") return ["録音準備", "台本確認、読み分け、収録順、喉の準備"];
+      if (state.priority === "fortune") return ["占いデータ整理", "記事テーマ、SNSネタ、鑑定メニュー用メモをまとめる"];
+      if (state.cycle === "week2") return ["録音準備またはBOOTH商品化", "台本整形、商品説明、画像素材を進める"];
+      return [`${writingLabel(state)}本文`, `${writingTargets(state)[state.day][0]}を目安に進める`];
+    }
+
+    function afternoonTask(state) {
+      if (state.hospital || state.energy === "low") return ["軽い編集・整理", "短時間で終わるものだけ"];
+      if (state.day === "sun" || state.practice) return ["稽古", "18時までは予定優先"];
+      if (state.priority === "recording") return ["録音", "本番収録、取り直し、使えるテイクの印を付ける"];
+      if (state.priority === "fortune") return ["占い記事・SNS作成", "記事本文、投稿文、画像や告知文を作る"];
+      if (state.cycle === "week2") return ["録音・音声編集", "午後前半は録音、遅めは編集に回す"];
+      if (state.projectType === "short") return ["通常創作の続き", "小説や短めシナリオの本文、会話、結末を進める"];
+      return ["制作の続き", "録音向けのセリフ調整や場面のつなぎ"];
+    }
+
+    function lateTask(state) {
+      if (state.day === "mon") return ["占い記事・SNS更新", "記事の更新、SNS投稿、次回の占いネタを1つ残す"];
+      if (state.day === "tue" || state.day === "fri") return ["軽い整理・占いSNS", "制作メモの整理と占いSNSを1つ更新"];
+      if (state.day === "wed") return ["占いSNS更新", "仕事後に短文投稿か明日の占いネタを1つ残す"];
+      if (state.priority === "recording") return ["録音データ整理・占いSNS", "ファイル名整理、ノイズ確認、占いSNSを1つ更新"];
+      if (state.cycle === "week2") return ["編集・商品ページ・占いSNS", "音声確認、BOOTH説明文、占いSNSを1つ更新"];
+      if (state.priority === "fortune") return ["占い発信の整理", "投稿予約、記事見出し、次回テーマ、占いSNSを整える"];
+      if (state.projectType === "short") return ["短編の読み返し・占いSNS", "続きのメモと占いSNSを1つ更新"];
+      return ["読み返し・占いSNS", "明日書く場面のメモと占いSNSを1つ更新"];
+    }
+
+    function buildPlans(state) {
+      const fixed = fixedBlocks(state);
+      const morning = mainMorningTask(state);
+      const afternoon = afternoonTask(state);
+      const late = lateTask(state);
+      const focus = focusLabel(state);
+      const planA = {
+        title: focus === "軽作業" ? "軽作業プラン" : `${focus}プラン`,
+        badge: focus,
+        color: focus === "録音中心" ? "blue" : focus === "軽作業" ? "yellow" : "green",
+        slots: [
+          ["9:30-11:30", morning[0], morning[1]],
+          ["12:30-15:30", afternoon[0], afternoon[1]],
+          ["16:00-18:00", late[0], late[1]],
+          ["夜-深夜", state.day === "sat" || state.stream ? "配信以外は休憩" : "休憩", "夜は回復に使う"]
+        ]
+      };
+
+      fixed.forEach(block => {
+        const slot = [block[0], block[1], "固定予定"];
+        if (block[0].includes("17:00")) planA.slots.splice(0, 1, slot);
+        else if (block[0].includes("13:00")) planA.slots.splice(1, 1, slot);
+        else if (block[0].includes("16:00")) planA.slots.splice(2, 1, slot);
+        else planA.slots.push(slot);
+      });
+
+      const planB = {
+        title: "ゆるめプラン",
+        badge: "負荷少なめ",
+        color: "yellow",
+        slots: [
+          ["10:00-11:00", state.cycle === "week1" ? `場面メモか${state.projectType === "short" ? "300字" : "500字"}` : "台本・販売文の確認", "始められたら十分"],
+          ["13:00-14:30", "短い創作か占いSNS案", "一つだけ終わらせる"],
+          ["16:00-17:00", "編集・整理", "音声確認、ファイル名整理、明日の準備"],
+          ["夜-深夜", "休憩", "判断を増やさない"]
+        ]
+      };
+
+      const planC = {
+        title: "最低限プラン",
+        badge: "崩さない",
+        color: "red",
+        slots: [
+          ["好きな時間", state.day === "tue" || state.day === "fri" ? "投稿予約の確認" : "次の一手メモ", "5-15分で終える"],
+          ["夕方", state.cycle === "week1" ? "次の場面を3行だけ書く" : "BOOTH作業を1項目だけ確認", "未完了でも止めてよい"],
+          ["夜-深夜", "休息", "睡眠前の負荷を下げる"]
+        ]
+      };
+
+      if (state.energy === "high" && !state.hospital && state.day !== "wed") {
+        planA.slots[0][2] += "。余力があれば目安より+500字";
+      }
+
+      if (state.priority === "rest") {
+        return [planB, planC, {
+          title: "回復プラン",
+          badge: "休息優先",
+          color: "green",
+          slots: [
+            ["午前", "生活ルーティン", "起床、食事、軽い片付け"],
+            ["午後", "軽い確認", "締切と投稿予約だけ見る"],
+            ["夜-深夜", "完全休憩", "制作判断を翌日に回す"]
+          ]
+        }];
+      }
+
+      return [planA, planB, planC];
+    }
+
+    function renderPlans(state) {
+      const plans = buildPlans(state);
+      document.getElementById("plans").innerHTML = plans.map(plan => `
+        <article class="plan">
+          <div class="plan-head">
+            <h3>${plan.title}</h3>
+            <span class="badge ${plan.color}">${plan.badge}</span>
+          </div>
+          <div class="timeline">
+            ${plan.slots.map(slot => `
+              <div class="slot">
+                <div class="time">${slot[0]}</div>
+                <div class="task">${slot[1]}<span>${slot[2]}</span></div>
+              </div>
+            `).join("")}
+          </div>
+        </article>
+      `).join("");
+    }
+
+    function renderNextAction(state) {
+      const hour = new Date().getHours();
+      let label = "今やること";
+      let task;
+
+      if (hour < 9) task = ["起床後の準備", "今日は判断を増やさず、9:30から始める"];
+      else if (hour < 12) task = mainMorningTask(state);
+      else if (hour < 16) task = afternoonTask(state);
+      else if (hour < 19) task = lateTask(state);
+      else task = [state.day === "sat" || state.stream ? "配信準備か休憩" : "休憩", "夜は基本的に回復へ"];
+
+      if (state.hospital) task = ["通院を中心にする", "予定の前後は軽作業だけ"];
+      if (state.energy === "low") task = ["最低限だけ", "次の場面メモか占いSNSを1つだけ"];
+
+      document.getElementById("nextAction").innerHTML = `
+        <div>
+          <span class="status">${dayNames[state.day]} / ${focusLabel(state)}</span>
+          <strong>${task[0]}</strong>
+          <p>${task[1]}</p>
+        </div>
+        <button class="primary" type="button" id="doneButton">できた</button>
+      `;
+      document.getElementById("doneButton").addEventListener("click", () => {
+        const add = state.cycle === "week1" && (task[0].includes("シナリオ") || task[0].includes("通常創作")) ? 500 : 0;
+        if (add) {
+          document.getElementById("words").value = Math.min(12000, state.words + add);
+          saveState();
+          render();
+        }
+      });
+    }
+
+    function renderChecklist(state) {
+      const checks = readChecks();
+      const items = checklistItems(state);
+      const checklist = document.getElementById("checklist");
+      checklist.innerHTML = items.map(item => {
+        const checked = Boolean(checks[item[0]]);
+        return `
+          <label class="check-item ${checked ? "done" : ""}">
+            <input type="checkbox" data-check-id="${item[0]}" ${checked ? "checked" : ""}>
+            <span>
+              <strong>${item[1]}</strong>
+              <span>${item[2]}</span>
+            </span>
+          </label>
+        `;
+      }).join("");
+
+      checklist.querySelectorAll("input[type='checkbox']").forEach(input => {
+        input.addEventListener("change", event => {
+          const nextChecks = readChecks();
+          nextChecks[event.target.dataset.checkId] = event.target.checked;
+          saveChecks(nextChecks);
+          renderChecklist(readState());
+        });
+      });
+    }
+
+    function renderWeek(state) {
+      const data = state.cycle === "week1" ? writingTargets(state) : week2Targets;
+      const order = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+      const title = state.cycle === "week1"
+        ? `${writingGoalText(state)}の制作配分`
+        : "2週目の録音・編集・BOOTH配分";
+      document.getElementById("weekTitle").textContent = title;
+      document.getElementById("weekGrid").innerHTML = order.map(day => `
+        <div class="week-day">
+          <strong>${dayNames[day].replace("曜日", "")}：${data[day][0]}</strong>
+          <p>${data[day][1]}</p>
+        </div>
+      `).join("");
+    }
+
+    function renderProgress(state) {
+      const goal = writingGoal(state);
+      const percent = Math.min(100, Math.round((state.words / goal) * 100));
+      document.getElementById("progressTitle").textContent = `${writingLabel(state)}の進み具合`;
+      document.getElementById("wordText").textContent = `${state.words.toLocaleString()} / ${goal.toLocaleString()}字`;
+      document.getElementById("wordPercent").textContent = `${percent}%`;
+      document.getElementById("meterFill").style.width = `${percent}%`;
+      const remaining = Math.max(0, goal - state.words);
+      if (state.projectType === "short") {
+        document.getElementById("wordNote").textContent = remaining === 0
+          ? "短め創作の中心目標に到達。5000字以内で整えるか、次の作品メモへ。"
+          : `残り約${remaining.toLocaleString()}字。1500字を超えたら短編として一度まとめ始めてもOKです。`;
+      } else {
+        document.getElementById("wordNote").textContent = remaining === 0
+          ? "1週目の文字数目安に到達。次は読み上げやすさの調整へ。"
+          : `残り約${remaining.toLocaleString()}字。今日は「目安文字数」か「次の場面メモ」で十分です。`;
+      }
+    }
+
+    function render() {
+      const state = readState();
+      saveState();
+      renderNextAction(state);
+      renderChecklist(state);
+      renderPlans(state);
+      renderWeek(state);
+      renderProgress(state);
+    }
+
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener("change", render);
+      el.addEventListener("input", render);
+    });
+
+    document.getElementById("todayButton").addEventListener("click", applyToday);
+    document.getElementById("refreshButton").addEventListener("click", render);
+    document.getElementById("resetChecksButton").addEventListener("click", () => {
+      localStorage.removeItem(checklistStorageKey());
+      renderChecklist(readState());
+    });
+
+    if (!loadState()) applyToday();
+    render();
+
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>

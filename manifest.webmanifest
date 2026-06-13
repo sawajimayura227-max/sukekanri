@@ -1,0 +1,12 @@
+{
+  "name": "まよわない一日",
+  "short_name": "まよわない一日",
+  "start_url": "./routine-planner-app.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#17231f",
+  "description": "制作・投稿・占い発信・休息のための週間プラン",
+  "lang": "ja",
+  "orientation": "portrait-primary"
+}
